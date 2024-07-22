@@ -18,4 +18,18 @@ app.get('/', (req, res) => {
   res.send(req.session);
 });
 
+app.post('/login', (req, res) => {
+  req.session.name = req.name;
+  res.send(req.session);
+  console.log('session created',req.session);
+//   res.redirect('/');
+});
+
+app.get('/logout', (req, res) => {
+  req.session.destroy();
+  res.send(req.session);
+  console.log('session destroyed',req.session);
+//   res.redirect('/');
+});
+
 app.listen(3000);
