@@ -1,8 +1,8 @@
 const express = require('express');
 const session = require('express-session');
-
+const cors = require('cors');
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT|5000;
 const cors_origin = '*';
 
 // กำหนดค่า Session
@@ -34,9 +34,9 @@ app.get('/logout', (req, res) => {
 //   res.redirect('/');
 });
 
-app.get('/cors', (req, res) => {
+app.post('/cors', (req, res) => {
   res.set('Access-Control-Allow-Origin', cors_origin);
   res.send({ "msg": "This has CORS enabled 🎈" })
   })
 
-app.listen(port);
+app.listen(PORT);
