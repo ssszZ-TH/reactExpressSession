@@ -1,67 +1,57 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
-const BACKEND = "http://localhost:5000";
+import axios from 'axios';
 
-function App() {
-  const [name, setName] = useState("");
-  const [msg, setMsg] = useState("");
+axios.defaults.withCredentials = true;
 
-  const login = (name) => {
+const App = () => {
+  const [name, setName] = useState('');
+
+  const checkLogin = async () => {
     try {
-      const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name }),
-      };
-      fetch(BACKEND + "/login", requestOptions)
-    } catch (e) {
-      console.log(e);
+      const response = await axios.get('http://localhost:5000/checkLogin');
+      // setName(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
 
-  const logout = () => {
+  const handleLogin = async (name) => {
     try {
-      fetch(BACKEND + "/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      console.log("logout");
-    } catch (e) {
-      console.log(e);
+      const response = await axios.post('http://localhost:5000/login', { name: name });
+      console.log(response.data);
+      checkLogin();
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
 
-  const checkLogin = () => {
+  const handleLogout = async () => {
     try {
-      fetch(BACKEND + "/checkLogin", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }).then((response) => {
-        console.log(response);
-      });
-    } catch (e) {
-      console.log(e);
+      const response = await axios.post('http://localhost:5000/logout');
+      console.log(response.data);
+      // setName('');
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
+
 
   return (
     <>
-      <h1>backend response = {msg}</h1>
+      <h1>backend response =</h1>
       <h1>name:{name}</h1>
       <input type="text" onChange={(e) => setName(e.target.value)} />
       <button
         onClick={() => {
-          login(name);
+          handleLogin(name);
         }}
       >
         login
       </button>
-      <button onClick={logout}>logout</button>
+      <button onClick={handleLogout}>logout</button>
       <button onClick={checkLogin}>checkLogin</button>
     </>
   );

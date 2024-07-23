@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const app = express();
 
 const PORT = process.env.PORT || 5000;
-const cors_origin = '*';
+const cors_origin = 'http://localhost:5173'; // ต้องตั้งค่าให้ตรงกับที่อยู่ของ React app
 
 // กำหนดค่า Session
 const sessionConfig = {
@@ -19,6 +19,7 @@ app.use(session(sessionConfig));
 app.use(cors({
   origin: cors_origin,
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true, // อนุญาตให้ส่ง cookie ใน cross-origin requests
 }));
 app.use(bodyParser.json()); // ใช้ body-parser เพื่อจัดการ request body
 
