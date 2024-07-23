@@ -1,42 +1,60 @@
 const express = require('express');
 const session = require('express-session');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const app = express();
-const PORT = process.env.PORT|5000;
+
+const PORT = process.env.PORT || 5000;
 const cors_origin = '*';
 
 // กำหนดค่า Session
 const sessionConfig = {
   secret: 'secret',
-  resave: true, // บันทึก session ทุกครั้งที่มีการร้องขอ
-  saveUninitialized: true, // บันทึก session ทุกครั้งที่มีการร้องขอ โดยไม่คำนึงว่า session จะมีข้อมูลหรือไม่
-  maxAge: 3600,
+  resave: true,
+  saveUninitialized: true,
+  cookie: { maxAge: 3600 * 1000 } // maxAge ในหน่วยมิลลิวินาที
 };
 
 app.use(session(sessionConfig));
+app.use(cors({
+  origin: cors_origin,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+}));
+app.use(bodyParser.json()); // ใช้ body-parser เพื่อจัดการ request body
 
 app.get('/', (req, res) => {
   // แสดงข้อมูล Session
-  res.send(req.session);
+  res.send({ hello: 'hello' });
+});
+
+app.get('/checkLogin', (req, res) => {
+  // แสดงข้อมูล Session
+  if (req.session.name) {
+    res.send({ name: req.session.name });
+  } else {
+    res.status(401).send({ error: 'Not logged in' });
+  }
 });
 
 app.post('/login', (req, res) => {
-  req.session.name = req.name;
-  res.send(req.session);
-  console.log('session created',req.session);
-//   res.redirect('/');
+  const { name } = req.body;
+  if (name) {
+    req.session.name = name;
+    res.send({ message: 'Login successful', name: req.session.name });
+  } else {
+    res.status(400).send({ error: 'Name is required' });
+  }
 });
 
-app.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.send(req.session);
-  console.log('session destroyed',req.session);
-//   res.redirect('/');
+app.post('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).send({ error: 'Failed to destroy session' });
+    }
+    res.send({ message: 'Logout successful' });
+  });
 });
 
-app.post('/cors', (req, res) => {
-  res.set('Access-Control-Allow-Origin', cors_origin);
-  res.send({ "msg": "This has CORS enabled 🎈" })
-  })
-
-app.listen(PORT);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

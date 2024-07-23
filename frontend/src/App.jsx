@@ -1,62 +1,70 @@
-import { useEffect, useState } from 'react'
-import './App.css'
+import { useEffect, useState } from "react";
+import "./App.css";
 
-const host='http://localhost:3000'
+const BACKEND = "http://localhost:5000";
 
 function App() {
-  const [name,setName]=useState('');
-  const [msg,setMsg]=useState('');
+  const [name, setName] = useState("");
+  const [msg, setMsg] = useState("");
 
-  const login= (name)=>{
-    try{
-      fetch(host+'/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name }),
-    }).then((response) => {
-      console.log(response);
-      return response.json();
-    }).then((data) => {
-      setMsg(data.message);
-    })
-    }catch (e){
+  const login = (name) => {
+    try {
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name }),
+      };
+      fetch(BACKEND + "/login", requestOptions)
+    } catch (e) {
       console.log(e);
     }
-  }
+  };
 
-  const logout=()=>{
-    
-  }
+  const logout = () => {
+    try {
+      fetch(BACKEND + "/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("logout");
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
-  const getcors=()=>{
-    console.log('get cors origin from',host);
-    fetch(host+'/cors', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-  }).then((response) => {
-    console.log(response);
-    return response.json();
-  }).then((data) => {
-    setMsg(data.message);
-  })
-  }
-  useEffect(()=>{
-    getcors();
-  },[])
+  const checkLogin = () => {
+    try {
+      fetch(BACKEND + "/checkLogin", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then((response) => {
+        console.log(response);
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   return (
     <>
       <h1>backend response = {msg}</h1>
       <h1>name:{name}</h1>
-      <input type="text" onChange={(e)=>setName(e.target.value)}/>
-      <button onClick={()=>{login(name)}}>login</button>
+      <input type="text" onChange={(e) => setName(e.target.value)} />
+      <button
+        onClick={() => {
+          login(name);
+        }}
+      >
+        login
+      </button>
       <button onClick={logout}>logout</button>
+      <button onClick={checkLogin}>checkLogin</button>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
